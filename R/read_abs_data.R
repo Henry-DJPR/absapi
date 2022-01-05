@@ -15,6 +15,8 @@
 #' Windows) for parallel evaluations
 #' @param api_key Unused
 #' @param detail The desired amount of detail to be returned as per API documentation
+#' @param scaled_units Should observations be returned as reported units
+#' (e.g. '000) or actual values
 #' @param method Method to be used for downloading files. Current download
 #' methods are "internal", "wininet" (Windows only) "libcurl", "wget" and
 #' "curl", and there is a value "auto": see ‘Details’ and ‘Note’ in
@@ -43,6 +45,7 @@ read_abs_api <- function(
   cl = NULL,
   api_key = NULL,
   detail = "full",
+  scaled_units = FALSE,
   method = "libcurl",
   mode = "w"
 ){
@@ -53,6 +56,7 @@ read_abs_api <- function(
 
   # Match arguments
   detail <- match.arg(detail, c("full", "dataonly", "serieskeysonly", "nodata"))
+  scaled_units <- match.arg(scaled_units, c(FALSE, TRUE))
 
 
   # Convert other arguments to filter list
@@ -350,7 +354,7 @@ read_abs_api <- function(
 
 
   # Correct unit scale
-  if("UNIT_MULT" %in% colnames(data)){
+  if("UNIT_MULT" %in% colnames(data) & !scaled_units){
     data$OBS_VALUE <- ifelse(
       is.na(data$UNIT_MULT),
       data$OBS_VALUE,

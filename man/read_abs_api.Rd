@@ -13,6 +13,7 @@ read_abs_api(
   cl = NULL,
   api_key = NULL,
   detail = "full",
+  scaled_units = FALSE,
   method = "libcurl",
   mode = "w"
 )
@@ -38,6 +39,9 @@ Windows) for parallel evaluations}
 \item{api_key}{Unused}
 
 \item{detail}{The desired amount of detail to be returned as per API documentation}
+
+\item{scaled_units}{Should observations be returned as reported units
+(e.g. '000) or actual values}
 
 \item{method}{Method to be used for downloading files. Current download
 methods are "internal", "wininet" (Windows only) "libcurl", "wget" and
