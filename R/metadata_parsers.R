@@ -109,7 +109,10 @@ meta_date_format <- function(path){
   # Get frequency
   constr <- xml2::xml_child(constr, current)
   freq <- xml2::xml_text(
-    xml2::xml_child(constr,"structure:CubeRegion/common:KeyValue[@id='FREQ']")
+    xml2::xml_child(
+      constr,
+      "structure:CubeRegion/common:KeyValue[@id='FREQ']|structure:CubeRegion/common:KeyValue[@id='FREQUENCY']"
+      )
   )
 
 
@@ -302,7 +305,10 @@ meta_n_obs_pa <- function(path){
   # Get frequency
   constr <- xml2::xml_child(constr, current)
   freq <- xml2::xml_text(
-    xml2::xml_child(constr,"structure:CubeRegion/common:KeyValue[@id='FREQ']")
+    xml2::xml_child(
+      constr,
+      "structure:CubeRegion/common:KeyValue[@id='FREQ']|structure:CubeRegion/common:KeyValue[@id='FREQUENCY']"
+    )
   )
 
 

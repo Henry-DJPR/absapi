@@ -118,9 +118,15 @@ read_abs_api <- function(
     lubridate::as_date(min_date),
     lubridate::as_date(date_range[1])
     )
+  min_date <- min(
+    min_date,
+    max_date
+  )
 
   n_obs_pa <- meta_n_obs_pa(meta_path)
   n_years <- as.numeric((max_date - min_date) / 365)
+  n_dates <- n_obs_pa * n_years
+  if(n_dates < 1 | !is.finite(n_dates)) n_dates <- 1
 
   max_date <- as_abs_date(max_date, date_format)
   min_date <- as_abs_date(min_date, date_format)
@@ -226,7 +232,7 @@ read_abs_api <- function(
 
   # Estimate query size
   dim_lengths <- sapply(dimensions, length)
-  query_size <- prod(dim_lengths) * as.numeric(ceiling(n_obs_pa * n_years))
+  query_size <- prod(dim_lengths) * n_dates
   req_n_splits <- ceiling(query_size / max_query_size)
 
 
