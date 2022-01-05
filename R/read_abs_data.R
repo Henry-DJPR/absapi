@@ -56,7 +56,6 @@ read_abs_api <- function(
 
   # Match arguments
   detail <- match.arg(detail, c("full", "dataonly", "serieskeysonly", "nodata"))
-  scaled_units <- match.arg(scaled_units, c(FALSE, TRUE))
 
 
   # Convert other arguments to filter list
@@ -91,6 +90,10 @@ read_abs_api <- function(
 
   if(!is.null(api_key)) warning(
     "API keys are not yet implimented"
+  )
+
+  if(!("logical" %in% class(scaled_units))) stop(
+    "scaled_units must be logical"
   )
 
 
