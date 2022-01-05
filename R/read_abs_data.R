@@ -117,26 +117,32 @@ read_abs_api <- function(
   date_range <- meta_date_range(meta_path)
   date_format <- meta_date_format(meta_path)
 
-  max_date <- min(
-    lubridate::as_date(max_date),
-    lubridate::as_date(date_range[2])
+  if(!is.na(date_format)){
+    max_date <- min(
+      lubridate::as_date(max_date),
+      lubridate::as_date(date_range[2])
     )
-  min_date <- max(
-    lubridate::as_date(min_date),
-    lubridate::as_date(date_range[1])
+    min_date <- max(
+      lubridate::as_date(min_date),
+      lubridate::as_date(date_range[1])
     )
-  min_date <- min(
-    min_date,
-    max_date
-  )
+    min_date <- min(
+      min_date,
+      max_date
+    )
 
-  n_obs_pa <- meta_n_obs_pa(meta_path)
-  n_years <- as.numeric((max_date - min_date) / 365)
-  n_dates <- n_obs_pa * n_years
-  if(n_dates < 1 | !is.finite(n_dates)) n_dates <- 1
+    n_obs_pa <- meta_n_obs_pa(meta_path)
+    n_years <- as.numeric((max_date - min_date) / 365)
+    n_dates <- n_obs_pa * n_years
+    if(n_dates < 1 | !is.finite(n_dates)) n_dates <- 1
 
-  max_date <- as_abs_date(max_date, date_format)
-  min_date <- as_abs_date(min_date, date_format)
+    max_date <- as_abs_date(max_date, date_format)
+    min_date <- as_abs_date(min_date, date_format)
+  } else {
+    n_dates <- 1
+  }
+
+
 
 
   # Get metadata & column order (data key)
@@ -294,20 +300,35 @@ read_abs_api <- function(
 
 
   # URL construction
-  data_url <- paste0(
-    abs_api_url,
-    "/data/ABS,",
-    dataset,
-    "/",
-    dim_strings,
-    "?startPeriod=",
-    min_date,
-    "&endPeriod=",
-    max_date,
-    "&detail=",
-    detail,
-    "&format=csv"
+  if(!is.na(date_format)){
+    data_url <- paste0(
+      abs_api_url,
+      "/data/ABS,",
+      dataset,
+      "/",
+      dim_strings,
+      "?startPeriod=",
+      min_date,
+      "&endPeriod=",
+      max_date,
+      "&detail=",
+      detail,
+      "&format=csv"
     )
+  } else {
+    data_url <- paste0(
+      abs_api_url,
+      "/data/ABS,",
+      dataset,
+      "/",
+      dim_strings,
+      "?dimensionAtObservation=AllDimensions",
+      "&detail=",
+      detail,
+      "&format=csv"
+    )
+  }
+
 
 
   # Download data
@@ -326,7 +347,7 @@ read_abs_api <- function(
 
 
   # Reclass dates
-  if("TIME_PERIOD" %in% colnames(data)){
+  if("TIME_PERIOD" %in% colnames(data) & !is.na(date_format)){
     data$TIME_PERIOD <- parse_abs_date(data$TIME_PERIOD, date_format) %iferror%
       data$TIME_PERIOD
   }
@@ -368,7 +389,9 @@ read_abs_api <- function(
 
 
   # Remove dataflow
-  data$DATAFLOW <- NULL
+  if("DATAFLOW" %in% names(data)){
+    data$DATAFLOW <- NULL
+  }
 
 
   # Fix names & order
@@ -379,8 +402,8 @@ read_abs_api <- function(
     "UNIT_MEASURE",
     paste0(col_order$name, "_name")
   )
-  data <- data[, c(reorder, names(data)[!(names(data) %in% reorder)])] %iferror%
-    data
+  reorder <- reorder[reorder %in% names(data)]
+  data <- data[, c(reorder, names(data)[!(names(data) %in% reorder)])]
   names(data) <- tolower(names(data))
 
 
