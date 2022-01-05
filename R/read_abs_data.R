@@ -320,7 +320,8 @@ read_abs_api <- function(
 
   # Reclass dates
   if("TIME_PERIOD" %in% colnames(data)){
-    data$TIME_PERIOD <- parse_abs_date(data$TIME_PERIOD, date_format)
+    data$TIME_PERIOD <- parse_abs_date(data$TIME_PERIOD, date_format) %iferror%
+      data$TIME_PERIOD
   }
 
 

@@ -52,13 +52,13 @@ as_abs_date <- function(date, date_code){
 parse_abs_date <- function(date, date_code){
   switch(
     date_code,
-    A = lubridate::parse_date_time2(date, "Y"),
-    M = lubridate::parse_date_time2(date, "Ym"),
-    D = lubridate::parse_date_time2(date, "Ymd"),
-    B = lubridate::parse_date_time2(date, "Ymd"),
+    A = lubridate::parse_date_time(date, "Y"),
+    M = lubridate::parse_date_time(date, "Ym"),
+    D = lubridate::parse_date_time(date, "Ymd"),
+    B = lubridate::parse_date_time(date, "Ymd"),
     W = lubridate::parse_date_time(paste0(date, "-1"), "YWw"),
     Q = lubridate::parse_date_time(date, "yq"),
-    S = lubridate::parse_date_time2(substr(date, 1L, 4L), "Y") + months(
+    S = lubridate::parse_date_time(substr(date, 1L, 4L), "Y") + months(
       as.integer(substr(date, nchar(date), nchar(date))) * 6 - 6
     ),
     N = stop("Minutely data not implimented"),
